@@ -2,6 +2,7 @@ import PuzzleFactory from './utils/PuzzleFactory';
 
 const args = process.argv.slice(2);
 const dayToSolve = args[0];
+const useSample = args[1]?.length > 0;
 
 if (!dayToSolve) {
   console.error('No day specified run with npm run dev {day}');
@@ -9,7 +10,7 @@ if (!dayToSolve) {
 }
 console.log(`Solving Day #${args[0]}`);
 (async () => {
-  const puzzle = await PuzzleFactory.getPuzzle(args[0]);
+  const puzzle = await PuzzleFactory.getPuzzle(args[0], useSample);
   console.log(puzzle.solveFirst());
   console.log(puzzle.solveSecond());
 })();
