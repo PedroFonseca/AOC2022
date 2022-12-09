@@ -1,4 +1,5 @@
-import PuzzleFactory from './utils/PuzzleFactory';
+import getPuzzle from './utils/getPuzzle';
+import getPuzzleInput from './utils/getPuzzleInput';
 
 const args = process.argv.slice(2);
 const dayToSolve = args[0];
@@ -8,9 +9,10 @@ if (!dayToSolve) {
   console.error('No day specified run with npm run dev {day}');
   process.exit(1);
 }
-console.log(`Solving Day #${args[0]}`);
+console.log(`Solving Day #${dayToSolve}`);
 (async () => {
-  const puzzle = await PuzzleFactory.getPuzzle(args[0], useSample);
-  console.log(puzzle.solveFirst());
-  console.log(puzzle.solveSecond());
+  const input = await getPuzzleInput(dayToSolve, useSample);
+  const puzzle = await getPuzzle(dayToSolve);
+  console.log(puzzle.solveFirst(input));
+  console.log(puzzle.solveSecond(input));
 })();

@@ -1,6 +1,4 @@
 export interface PuzzleInterface {
-  solveFirst: () => string;
-  solveSecond: () => string;
-  getFirstExpectedResult: () => string;
-  getSecondExpectedResult: () => string;
+  solveFirst: (input: string) => string;
+  solveSecond: (input: string) => string;
 }

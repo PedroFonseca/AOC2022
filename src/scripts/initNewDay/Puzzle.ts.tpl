@@ -1,23 +1,9 @@
-import Puzzle from '../../types/AbstractPuzzle';
+export const solveFirst = (input: string): string => {
+  return `solution 1 for input :\n${input}`;
+  // Solutions: 
+};
 
-export default class ConcretePuzzle extends Puzzle {
-  public solveFirst(): string {
-    // WRITE SOLUTION FOR TEST 1
-    return 'day 1 solution 1';
-  }
-
-  public getFirstExpectedResult(): string {
-    // RETURN EXPECTED SOLUTION FOR TEST 1;
-    return 'day 1 solution 1';
-  }
-
-  public solveSecond(): string {
-    // WRITE SOLUTION FOR TEST 2
-    return 'day 1 solution 2';
-  }
-
-  public getSecondExpectedResult(): string {
-    // RETURN EXPECTED SOLUTION FOR TEST 2;
-    return 'day 1 solution 2';
-  }
-}
+export const solveSecond = (input: string): string => {
+  return `solution 2 for input :\n${input}`;
+  // Solutions: 
+};

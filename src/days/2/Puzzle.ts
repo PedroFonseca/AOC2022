@@ -1,4 +1,3 @@
-import Puzzle from '../../types/AbstractPuzzle';
 type column1 = 'A' | 'B' | 'C';
 type column2 = 'X' | 'Y' | 'Z';
 
@@ -45,38 +44,27 @@ const getNeededShape = (shape1: column1, outcome: column2): column1 => {
     : winningMoves[shape1].wins;
 };
 
-export default class ConcretePuzzle extends Puzzle {
-  private getElfStrategy() {
-    return this.input
-      .split('\n')
-      .map((t) => t.split(' ') as [column1, column2]);
-  }
+const getElfStrategy = (input: string) =>
+  input.split('\n').map((t) => t.split(' ') as [column1, column2]);
 
-  public solveFirst(): string {
-    const getScore = (col1: column1, col2: column2) =>
-      getShapeScore(conversion[col2]) + getVictoryScore(col1, conversion[col2]);
+export const solveFirst = (input: string): string => {
+  const getScore = (col1: column1, col2: column2) =>
+    getShapeScore(conversion[col2]) + getVictoryScore(col1, conversion[col2]);
 
-    return `${this.getElfStrategy().reduce(
-      (agg, [col1, col2]) => agg + getScore(col1, col2),
-      0
-    )}`;
-  }
+  return `${getElfStrategy(input).reduce(
+    (agg, [col1, col2]) => agg + getScore(col1, col2),
+    0
+  )}`;
+  // Solutions: 15, 13526
+};
 
-  public getFirstExpectedResult(): string {
-    return '15';
-  }
+export const solveSecond = (input: string): string => {
+  const getScore = (col1: column1, col2: column2) =>
+    getShapeScore(getNeededShape(col1, col2)) + getVictoryScore2(col2);
 
-  public solveSecond(): string {
-    const getScore = (col1: column1, col2: column2) =>
-      getShapeScore(getNeededShape(col1, col2)) + getVictoryScore2(col2);
-
-    return `${this.getElfStrategy().reduce(
-      (agg, [col1, col2]) => agg + getScore(col1, col2),
-      0
-    )}`;
-  }
-
-  public getSecondExpectedResult(): string {
-    return '12';
-  }
-}
+  return `${getElfStrategy(input).reduce(
+    (agg, [col1, col2]) => agg + getScore(col1, col2),
+    0
+  )}`;
+  // Solutions: 12, 14204
+};

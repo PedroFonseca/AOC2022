@@ -21,6 +21,6 @@ if (existsSync(`src/days/${day}`)) {
 }
 const newDayPath = `${basePath}/${day}`;
 mkdirSync(newDayPath);
-copyFileSync(`${__dirname}/Puzzle.ts.tpl`, `${newDayPath}/Puzzle.ts`);
+copyFileSync(`${__dirname}/Puzzle.ts.tpl`, `${newDayPath}/puzzle.ts`);
 writeFileSync(`${newDayPath}/input.txt`, '');
 writeFileSync(`${newDayPath}/sample.txt`, '');

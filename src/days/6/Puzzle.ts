@@ -1,5 +1,3 @@
-import Puzzle from '../../types/AbstractPuzzle';
-
 // Checks if all chars in string are different
 const allDifferent = (chars: string) => {
   const countChars = [...chars].reduce(
@@ -15,20 +13,12 @@ const findAllDifferent = (input: string, len: number) =>
       index >= len && allDifferent(input.substring(index - len, index))
   );
 
-export default class ConcretePuzzle extends Puzzle {
-  public solveFirst(): string {
-    return `${findAllDifferent(this.input, 4)}`;
-  }
+export const solveFirst = (input: string): string => {
+  return `${findAllDifferent(input, 4)}`;
+  // Solutions: 10, 1142
+};
 
-  public getFirstExpectedResult(): string {
-    return '10'; // 1142
-  }
-
-  public solveSecond(): string {
-    return `${findAllDifferent(this.input, 14)}`;
-  }
-
-  public getSecondExpectedResult(): string {
-    return '29'; // 2803
-  }
-}
+export const solveSecond = (input: string): string => {
+  return `${findAllDifferent(input, 14)}`;
+  // Solutions: 29, 2803
+};

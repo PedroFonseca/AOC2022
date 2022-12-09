@@ -1,5 +1,3 @@
-import Puzzle from '../../types/AbstractPuzzle';
-
 type Stacks = string[][];
 type Procedure = {
   num: number;
@@ -38,60 +36,52 @@ const executeProcedures = (
   return stacks;
 };
 
-export default class ConcretePuzzle extends Puzzle {
-  private getStacks() {
-    const stackStrings = this.input.split('\n\n')[0];
-    const stacksReversed = stackStrings.split('\n').reverse();
-    const stackNumbers = stacksReversed[0].replaceAll(' ', '');
-    return [...stackNumbers].reduce((agg, position) => {
-      const index = stacksReversed[0].indexOf(position);
-      return [
-        ...agg,
-        stacksReversed
-          .slice(1)
-          .map((t) => t[index])
-          .filter((t) => t !== ' '),
-      ];
-    }, []);
-  }
-  private getProcedures() {
-    const procedureStrings = this.input
-      .split('\n\n')[1]
-      .split('\n')
-      .map((t) => {
-        const indexFrom = t.indexOf(from);
-        const indexTo = t.indexOf(to);
-        return {
-          num: Number(t.substring(5, indexFrom)),
-          from: Number(t.substring(indexFrom + fromLen, indexTo)) - 1,
-          to: Number(t.substring(indexTo + toLen)) - 1,
-        };
-      });
-    return procedureStrings;
-  }
-  public solveFirst(): string {
-    const stacks = executeProcedures(
-      this.getStacks(),
-      this.getProcedures(),
-      executeProcedure1
-    );
-    return stacks.map((t) => t.pop()).join('');
-  }
+const getStacks = (input: string) => {
+  const stackStrings = input.split('\n\n')[0];
+  const stacksReversed = stackStrings.split('\n').reverse();
+  const stackNumbers = stacksReversed[0].replaceAll(' ', '');
+  return [...stackNumbers].reduce((agg, position) => {
+    const index = stacksReversed[0].indexOf(position);
+    return [
+      ...agg,
+      stacksReversed
+        .slice(1)
+        .map((t) => t[index])
+        .filter((t) => t !== ' '),
+    ];
+  }, []);
+};
 
-  public getFirstExpectedResult(): string {
-    return 'CMZ'; // TWSGQHNHL
-  }
+const getProcedures = (input: string) =>
+  input
+    .split('\n\n')[1]
+    .split('\n')
+    .map((t) => {
+      const indexFrom = t.indexOf(from);
+      const indexTo = t.indexOf(to);
+      return {
+        num: Number(t.substring(5, indexFrom)),
+        from: Number(t.substring(indexFrom + fromLen, indexTo)) - 1,
+        to: Number(t.substring(indexTo + toLen)) - 1,
+      };
+    });
 
-  public solveSecond(): string {
-    const stacks = executeProcedures(
-      this.getStacks(),
-      this.getProcedures(),
-      executeProcedure2
-    );
-    return stacks.map((t) => t.pop()).join('');
-  }
+export const solveFirst = (input: string): string => {
+  const stacks = executeProcedures(
+    getStacks(input),
+    getProcedures(input),
+    executeProcedure1
+  );
+  return stacks.map((t) => t.pop()).join('');
+  // Solutions: CMZ, TWSGQHNHL
+};
 
-  public getSecondExpectedResult(): string {
-    return 'MCD'; // JNRSCDWPP
-  }
-}
+export const solveSecond = (input: string): string => {
+  const stacks = executeProcedures(
+    getStacks(input),
+    getProcedures(input),
+    executeProcedure2
+  );
+  return stacks.map((t) => t.pop()).join('');
+  // Solutions: 'MCD', JNRSCDWPP
+};
