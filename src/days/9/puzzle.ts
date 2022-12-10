@@ -2,7 +2,7 @@ type Point = { x: number; y: number };
 type Direction = 'U' | 'D' | 'L' | 'R';
 
 const getPoint = (x: number, y: number): Point => ({ x, y });
-const print = (point: Point) => `[${point.x}, ${point.y}]`;
+// const print = (point: Point) => `[${point.x}, ${point.y}]`;
 
 const getInstructions = (input: string): [Direction, number][] =>
   input.split('\n').map((t) => {
@@ -25,13 +25,44 @@ const moveHead = (headPosition: Point, direction: Direction): Point => {
 };
 
 // Calculates new position of tail
-const moveTail = (headPosition: Point, tailPosition: Point): Point => {
+const moveKnot = (headPosition: Point, tailPosition: Point): Point => {
   // If it's already next to head, then don't move it
   if (
     Math.abs(headPosition.x - tailPosition.x) <= 1 &&
     Math.abs(headPosition.y - tailPosition.y) <= 1
   ) {
     return tailPosition;
+  }
+  // [-2,2] [0,0] => 1,1
+  // If moved diagonally, then knot moves diagonally as well
+  if (
+    Math.abs(headPosition.x - tailPosition.x) > 1 &&
+    Math.abs(headPosition.y - tailPosition.y) > 1
+  ) {
+    if (
+      headPosition.x - tailPosition.x > 1 &&
+      headPosition.y - tailPosition.y > 1
+    ) {
+      return getPoint(headPosition.x - 1, headPosition.y - 1);
+    }
+    if (
+      tailPosition.x - headPosition.x > 1 &&
+      tailPosition.y - headPosition.y > 1
+    ) {
+      return getPoint(headPosition.x + 1, headPosition.y + 1);
+    }
+    if (
+      headPosition.x - tailPosition.x > 1 &&
+      tailPosition.y - headPosition.y > 1
+    ) {
+      return getPoint(headPosition.x - 1, headPosition.y + 1);
+    }
+    if (
+      tailPosition.x - headPosition.x > 1 &&
+      headPosition.y - tailPosition.y > 1
+    ) {
+      return getPoint(headPosition.x + 1, headPosition.y - 1);
+    }
   }
   // Move tail toward head
   if (headPosition.x - tailPosition.x > 1) {
@@ -52,58 +83,110 @@ const moveTail = (headPosition: Point, tailPosition: Point): Point => {
   );
 };
 
+// const drawMapToConsole = (knotPositions: Point[]) => {
+//   const mapSize = 10;
+//   for (let i = mapSize; i > -mapSize; i--) {
+//     let line = '';
+//     for (let j = -mapSize; j < mapSize; j++) {
+//       const index = knotPositions.findIndex((t) => t.x === j && t.y === i);
+//       line +=
+//         index < 0
+//           ? i === 0 && j === 0
+//             ? 's'
+//             : '.'
+//           : index === 0
+//           ? 'H'
+//           : index;
+//     }
+//     console.log(line, i);
+//   }
+// };
+
+// const drawTailPositions = (tailPositions: Point[]) => {
+//   const mapSize = 50;
+//   for (let i = mapSize; i > -mapSize; i--) {
+//     let line = '';
+//     for (let j = -mapSize; j < mapSize; j++) {
+//       const index = tailPositions.findIndex((t) => t.x === j && t.y === i);
+//       line += index < 0 ? '.' : 'X';
+//     }
+//     console.log(line, i);
+//   }
+// };
+
 type InstructionExecutionResult = {
-  newHeadPosition: Point;
-  newTailPosition: Point;
+  newKnotPositions: Point[];
   tailPositions: Point[];
 };
 const executeInstruction = (
   [direction, times]: [Direction, number],
-  headPosition: Point,
-  tailPosition: Point
+  knotPositions: Point[]
 ) =>
   (Array.from({ length: times }) as undefined[]).reduce(
     (agg) => {
-      const newHeadPosition = moveHead(agg.newHeadPosition, direction);
-      const newTailPosition = moveTail(newHeadPosition, agg.newTailPosition);
-      // console.log(
-      //   `Moved direction ${direction}. Head: ${print(
-      //     newHeadPosition
-      //   )}, tail: ${print(newTailPosition)}`
-      // );
+      const newKnotPositions = agg.newKnotPositions
+        .slice(1)
+        .reduce(
+          (agg, position) => [...agg, moveKnot(agg[agg.length - 1], position)],
+          [moveHead(agg.newKnotPositions[0], direction)]
+        );
+      const newTailPositions = [
+        ...agg.tailPositions,
+        newKnotPositions[newKnotPositions.length - 1],
+      ];
+      // console.log(`${direction} --> ${newKnotPositions.map(print).join(' ')}`);
+      // drawMapToConsole(newKnotPositions);
+      // console.log('knot positions: ', newKnotPositions.map(print).join(','));
+      // console.log('newTailPositions: ', newTailPositions.map(print).join(','));
+
       return {
-        newHeadPosition,
-        newTailPosition,
-        tailPositions: [...agg.tailPositions, newTailPosition],
+        newKnotPositions,
+        tailPositions: newTailPositions,
       } as InstructionExecutionResult;
     },
     {
-      newHeadPosition: headPosition,
-      newTailPosition: tailPosition,
+      newKnotPositions: knotPositions,
       tailPositions: [],
     } as InstructionExecutionResult
   );
 
-export const solveFirst = (input: string): string => {
-  console.log(getInstructions(input));
+const solveForNumberOfKnots = (input: string, numberOfKnots: number) => {
+  const initialKnotPositions = Array.from({ length: numberOfKnots }).map((_) =>
+    getPoint(0, 0)
+  );
   const finalResult = getInstructions(input).reduce(
     (agg, instruction) => {
       const instructionResult = executeInstruction(
         instruction,
-        agg.newHeadPosition,
-        agg.newTailPosition
+        agg.newKnotPositions
       );
+      // console.log(`${instruction[0]}-${instruction[1]}`);
+      // drawMapToConsole(instructionResult.newKnotPositions);
+      // if (instructionResult.tailPositions.length > prevSize) {
+      //   prevSize = instructionResult.tailPositions.length;
+      //   drawTailPositions(instructionResult.tailPositions);
+      // }
+      const newTailPositions: Point[] = [
+        ...agg.tailPositions,
+        ...instructionResult.tailPositions,
+      ];
+
+      // console.log(
+      //   `${instruction[0]} ${instruction[1]} tailPositions: `,
+      //   [
+      //     ...new Set(
+      //       newTailPositions.map((position) => `${position.x},${position.y}`)
+      //     ),
+      //   ].join(' ')
+      // );
+      // console.log('tailPositions: ', newTailPositions.map(print).join(','));
       return {
         ...instructionResult,
-        tailPositions: [
-          ...agg.tailPositions,
-          ...instructionResult.tailPositions,
-        ],
+        tailPositions: newTailPositions,
       };
     },
     {
-      newHeadPosition: getPoint(0, 0),
-      newTailPosition: getPoint(0, 0),
+      newKnotPositions: initialKnotPositions,
       tailPositions: [],
     } as InstructionExecutionResult
   );
@@ -111,11 +194,17 @@ export const solveFirst = (input: string): string => {
     finalResult.tailPositions.map((position) => `${position.x},${position.y}`)
   );
 
+  // drawTailPositions(finalResult.tailPositions);
+
   return `${uniqueTailPositions.size}`;
+};
+
+export const solveFirst = (input: string): string => {
+  return solveForNumberOfKnots(input, 2);
   // Solutions: 13, 5874
 };
 
 export const solveSecond = (input: string): string => {
-  return `solution 2 for input :`;
-  // Solutions:
+  return solveForNumberOfKnots(input, 10);
+  // Solutions: 36, 2467
 };
